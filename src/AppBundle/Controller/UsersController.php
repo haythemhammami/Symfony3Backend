@@ -53,6 +53,7 @@ class UsersController extends Controller
         $password = $request->get('password');
         $firstname = $request->get('firstname');
         $lastname = $request->get('lastname');
+        $email = $request->get('email');
         $role = $request->get('role');
 
         if (empty($username)) {
@@ -66,9 +67,9 @@ class UsersController extends Controller
 
         $dataUser->setPassword($password);
         $dataUser->setUsername($username);
-
         $dataUser->setFirstname($firstname);
         $dataUser->setLastname($lastname);
+        $dataUser->setEmail($email);
         $dataUser->setRole($role);
 
         $em = $this->getDoctrine()->getManager();
@@ -124,5 +125,38 @@ class UsersController extends Controller
         return new Response($singleUser);
 
     }
-
+    /**
+     * @Rest\Put("/user/{id}")
+     */
+    public function updateAction($id,Request $request)
+    {
+        $data = new User;
+        $role = $request->get('role');
+        $firstname = $request->get('firstname');
+        $lastname = $request->get('lastname');
+        $password = $request->get('password');
+        $lastname = $request->get('role');
+        $sn = $this->getDoctrine()->getManager();
+        $user = $this->getDoctrine()->getRepository('AppBundle:User')->find($id);
+        if (empty($user)) {
+            return new View("user not found", Response::HTTP_NOT_FOUND);
+        }
+        elseif(!empty($name) && !empty($role)){
+            $user->setName($name);
+            $user->setRole($role);
+            $sn->flush();
+            return new View("User Updated Successfully", Response::HTTP_OK);
+        }
+        elseif(empty($name) && !empty($role)){
+            $user->setRole($role);
+            $sn->flush();
+            return new View("role Updated Successfully", Response::HTTP_OK);
+        }
+        elseif(!empty($name) && empty($role)){
+            $user->setName($name);
+            $sn->flush();
+            return new View("User Name Updated Successfully", Response::HTTP_OK);
+        }
+        else return new View("User name or role cannot be empty", Response::HTTP_NOT_ACCEPTABLE);
+    }
 }
